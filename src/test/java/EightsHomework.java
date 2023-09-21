@@ -3,6 +3,9 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.security.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,55 +53,24 @@ public class EightsHomework {
 
     @Test
     public void updateRealNameTest() {
-        String realName = "real name";
+        String timestamp = new java.text.SimpleDateFormat("MM/dd/yyyy h:mm:ss a").format(new Date());
+        String newRealName = "new_real_name_" + timestamp;
         Response responseUpdateRealName = RestAssured
                 .given()
                 .contentType("application/x-www-form-urlencoded")
                 .cookies(cookies)
-                .body("password_current=&password=&password_confirm=&email=rov55an3014%40mail.ru&realname=" + realName)
+                .body("password_current=&password=&password_confirm=&email=rov55an3014%40mail.ru&realname=" + newRealName)
                 .post("https://academ-it.ru/mantisbt/account_update.php")
                 .andReturn();
 //        System.out.println("\nResponse");
 //        responseUpdateRealName.prettyPrint();
-        assertEquals(200, responseUpdateRealName.statusCode(), "Response status code is not as expected");
-
-        Response response = RestAssured
-                .given()
-                .cookies(cookies)
-                .get("https://academ-it.ru/mantisbt/account_update.php")
-                .andReturn();
-        assertEquals(200, response.statusCode(), "Response status code is not as expected");
-        org.junit.jupiter.api.Assertions.assertTrue(response.body().asString().contains("Real name successfully updated"));
+        assertTrue(responseUpdateRealName.body().asString().contains("Real name successfully updated"));
 
         Response checkUpdatedRealName = RestAssured
                 .given()
                 .cookies(cookies)
                 .get("https://academ-it.ru/mantisbt/account_page.php")
                 .andReturn();
-        assertEquals(200, checkUpdatedRealName.statusCode(), "Response status code is not as expected");
-        System.out.println(checkUpdatedRealName.body().asString());
-        assertTrue(checkUpdatedRealName.body().asString().contains("real name"));
-        org.junit.jupiter.api.Assertions.assertTrue(checkUpdatedRealName.body().asString().contains("name=\"realname\" value=\"real name\""));
-
-
-        Response checkUpdatedRealNameVersionTwo = RestAssured
-                .given()
-                .cookies(cookies)
-                .get("https://academ-it.ru/mantisbt/my_view_page.php")
-                .andReturn();
-        assertEquals(200, checkUpdatedRealNameVersionTwo.statusCode(), "Response status code is not as expected");
-        System.out.println(checkUpdatedRealNameVersionTwo.body().asString());
-        org.junit.jupiter.api.Assertions.assertTrue(checkUpdatedRealNameVersionTwo.body().asString().contains("admin ( real name )"));
-    }
-
-    @Test
-    public void checkUpdatedRealName() {
-        Response checkUpdatedRealName = RestAssured
-                .given()
-                .cookies(cookies)
-                .get("https://academ-it.ru/mantisbt/my_view_page.php")
-                .andReturn();
-        assertEquals(200, checkUpdatedRealName.statusCode(), "Response status code is not as expected");
-        System.out.println(checkUpdatedRealName.body().asString());
+        assertTrue(checkUpdatedRealName.body().asString().contains(newRealName));
     }
 }
